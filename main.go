@@ -81,7 +81,7 @@ func main() {
 	})
 
 	// insert a new employee
-	app.Post("/employee", func(c *fiber.Ctx) error {
+	app.Post("/employees", func(c *fiber.Ctx) error {
 		collection := mg.Db.Collection("employees")
 
 		employee := new(Employee)
@@ -107,7 +107,7 @@ func main() {
 	})
 
 	// update an employee record
-	app.Put("/employee/:id", func(c *fiber.Ctx) error {
+	app.Put("/employees/:id", func(c *fiber.Ctx) error {
 		idParam := c.Params("id")
 		employID, err := primitive.ObjectIDFromHex(idParam)
 
@@ -143,7 +143,7 @@ func main() {
 	})
 
 	//delete an employee
-	app.Delete("/employee/:id", func(c *fiber.Ctx) error {
+	app.Delete("/employees/:id", func(c *fiber.Ctx) error {
 		employeeId, err := primitive.ObjectIDFromHex(
 			c.Params("id"),
 		)
@@ -159,5 +159,23 @@ func main() {
 		}
 		return c.SendStatus(204)
 	})
+
+	// find one employee
+
+	app.Get("/employee/:id", func(c *fiber.Ctx) error {
+		employeeId, err := primitive.ObjectIDFromHex(c.Params("id"))
+
+		query := bson.D{{Key: "_id", Value: employeeId}}
+
+		result := mg.Db.Collection("employees").FindOne(c.Context(), query)
+
+		if err != nil {
+			return c.Status(404).SendString("not found")
+		}
+		employee := &Employee{}
+		result.Decode(employee)
+		return c.Status(200).JSON(employee)
+	})
+
 	log.Fatal(app.Listen(":3000"))
 }
