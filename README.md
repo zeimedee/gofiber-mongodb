@@ -1,5 +1,5 @@
 # gofiber-mongodb
-this is CRUD REST API built in go using gofiber and mongodb
+this is a CRUD REST API built in go using gofiber and mongodb
 
 run the app using:
 ```bash
